@@ -85,6 +85,10 @@ const APP_URL='https://script.google.com/macros/s/AKfycbymMbpBNtmxqVe1UhLms05--O
 
 let scanner=null,starting=false,detected=false;
 const langEl=document.getElementById('lang');
+const startBtnEl=document.getElementById('startBtn');
+const stopBtnEl=document.getElementById('stopBtn');
+const statusEl=document.getElementById('status');
+
 
 const UI={
 'en':{title:'Multilingual Medication Information Tool',subtitle:'Scan the QR code on your medication bag to view medication information in your language.',lang:'Choose language',scan:'Scan medication bag QR code',hint:'Point the rear camera at the QR code. Medication information will open automatically.',start:'📷 Start scanning',stop:'Stop camera',opening:'Opening camera…',ready:'Camera ready. Point it at the QR code.',found:'QR code detected. Opening medication information…',invalid:'This is not a supported medication information QR code.',camera:'Camera could not be opened. Please allow camera access and try again.',notice:'No photo is stored. The QR code is read only in your browser.'},
@@ -116,7 +120,7 @@ function applyUi(){
  document.documentElement.dir=langEl.value==='ar'?'rtl':'ltr';
 }
 
-function setStatus(msg,type='info'){status.textContent=msg;status.className='status '+type;status.classList.remove('hidden')}
+function setStatus(msg,type='info'){statusEl.textContent=msg;statusEl.className='status '+type;statusEl.classList.remove('hidden')}
 
 function extractCode(text){
  const s=String(text||'').trim();
@@ -128,9 +132,18 @@ function extractCode(text){
 }
 
 async function startScanner(){
- if(starting||detected)return;
- starting=true;setStatus(ui().opening,'info');
+ if(detected) detected=false;
+ if(starting){
+   starting=false;
+   try{ if(scanner){ await scanner.clear(); } }catch(e){}
+   scanner=null;
+ }
+ starting=true;
+ setStatus(ui().opening,'info');
  try{
+   if(typeof Html5Qrcode==='undefined'){
+     throw new Error('QR scanner library not loaded');
+   }
    scanner=new Html5Qrcode('reader');
    await scanner.start(
     {facingMode:'environment'},
@@ -145,9 +158,9 @@ async function startScanner(){
     },
     ()=>{}
    );
-   startBtn.classList.add('hidden');stopBtn.classList.remove('hidden');setStatus(ui().ready,'info');
+   startBtnEl.classList.add('hidden');stopBtnEl.classList.remove('hidden');setStatus(ui().ready,'info');
  }catch(err){
-   setStatus(ui().camera,'error');scanner=null;startBtn.classList.remove('hidden');stopBtn.classList.add('hidden');
+   setStatus(ui().camera,'error');scanner=null;startBtnEl.classList.remove('hidden');stopBtnEl.classList.add('hidden');
  }finally{starting=false}
 }
 
@@ -161,7 +174,7 @@ langEl.value=localStorage.getItem('drugToolLang')||detectLanguage();
 if(![...langEl.options].some(o=>o.value===langEl.value))langEl.value='en';
 applyUi();
 langEl.addEventListener('change',()=>{localStorage.setItem('drugToolLang',langEl.value);applyUi()});
-window.addEventListener('load',()=>setTimeout(()=>startScanner(),350));
+
 </script>
 </body>
 </html>
