@@ -91,7 +91,7 @@ select{width:100%;padding:14px;border:1px solid #b9c5d3;border-radius:12px;font-
   </div>
   <div id="status" class="status info hidden"></div>
 </section>
-<div class="notice" id="notice"></div><div class="notice" style="font-size:10px;opacity:.55">Scanner v1.9.3.1</div>
+<div class="notice" id="notice"></div><div class="notice" style="font-size:10px;opacity:.55">Scanner v1.14.1</div>
 </div>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -195,7 +195,8 @@ async function startScanner(){
         const url = APP_URL +
           (APP_URL.includes('?') ? '&' : '?') +
           'odr_code=' + encodeURIComponent(code) +
-          '&lang=' + encodeURIComponent(langEl.value);
+          '&lang=' + encodeURIComponent(langEl.value) +
+          '&return_url=' + encodeURIComponent(window.location.href.split('#')[0]);
 
         window.location.href = url;
       },
