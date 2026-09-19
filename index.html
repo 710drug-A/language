@@ -91,7 +91,7 @@ select{width:100%;padding:14px;border:1px solid #b9c5d3;border-radius:12px;font-
   </div>
   <div id="status" class="status info hidden"></div>
 </section>
-<div class="notice" id="notice"></div><div class="notice" style="font-size:10px;opacity:.55">Scanner v1.9.3</div>
+<div class="notice" id="notice"></div><div class="notice" style="font-size:10px;opacity:.55">Scanner v1.9.3.1</div>
 </div>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -144,7 +144,22 @@ function extractCode(text){
   try{return decodeURIComponent(m[1]).trim()}catch(e){return m[1].trim()}
 }
 async function startScanner(){
-  if (starting || detected) return;
+  if (starting) return;
+
+  // A manual Stop must allow a fresh scan session.
+  detected = false;
+
+  // Clean up any stale scanner instance / DOM left by iPhone Safari.
+  try{
+    if(scanner){
+      if(scanner.isScanning) await scanner.stop();
+      await scanner.clear();
+    }
+  }catch(e){}
+  scanner = null;
+
+  const readerEl = document.getElementById('reader');
+  if(readerEl) readerEl.innerHTML = '';
 
   starting = true;
   setStatus(ui().opening,'info');
@@ -208,9 +223,26 @@ async function startScanner(){
 }
 
 async function stopScanner(showStart=true){
-  try{if(scanner&&scanner.isScanning)await scanner.stop();if(scanner)await scanner.clear()}catch(e){}
-  scanner=null; readerStage.classList.remove('active'); guideBlock.classList.remove('hidden');
-  if(showStart){startBtnEl.classList.remove('hidden');stopBtnEl.classList.add('hidden');statusEl.classList.add('hidden')}
+  try{
+    if(scanner&&scanner.isScanning) await scanner.stop();
+    if(scanner) await scanner.clear();
+  }catch(e){}
+
+  scanner=null;
+  starting=false;
+  detected=false;
+
+  const readerEl=document.getElementById('reader');
+  if(readerEl) readerEl.innerHTML='';
+
+  readerStage.classList.remove('active');
+  guideBlock.classList.remove('hidden');
+
+  if(showStart){
+    startBtnEl.classList.remove('hidden');
+    stopBtnEl.classList.add('hidden');
+    statusEl.classList.add('hidden');
+  }
 }
 
 langEl.value=localStorage.getItem('drugToolLang')||detectLanguage();
