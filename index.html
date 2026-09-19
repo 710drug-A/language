@@ -1,274 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f4c81">
-  <title>Multilingual Medication Scanner</title>
-  <style>
-    :root{
-      --bg:#f5f7fa;--card:#fff;--ink:#1e293b;--muted:#64748b;
-      --primary:#0f4c81;--primary2:#1667a8;--line:#dbe3ec;
-      --danger:#b42318;--ok:#0f766e
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;font-family:system-ui,-apple-system,"Segoe UI","Noto Sans TC","PingFang TC",sans-serif;
-      background:var(--bg);color:var(--ink)
-    }
-    .wrap{max-width:760px;margin:0 auto;padding:18px 14px 36px}
-    .brand{
-      background:linear-gradient(135deg,var(--primary),var(--primary2));
-      color:#fff;border-radius:20px;padding:22px 20px;margin-bottom:14px;
-      box-shadow:0 10px 24px rgba(15,76,129,.16)
-    }
-    .brand h1{margin:0 0 6px;font-size:26px}
-    .brand p{margin:0;opacity:.94;line-height:1.5}
-    .card{
-      background:#fff;border:1px solid var(--line);border-radius:18px;
-      padding:18px;margin:12px 0;box-shadow:0 4px 14px rgba(15,23,42,.05)
-    }
-    .title{font-size:20px;font-weight:850;margin-bottom:8px}
-    select{
-      width:100%;padding:14px;border:1px solid #b9c5d3;border-radius:12px;
-      font-size:17px;background:#fff;color:var(--ink)
-    }
-    .btn{
-      width:100%;border:0;border-radius:12px;padding:15px 16px;margin-top:10px;
-      font-size:18px;font-weight:800;background:var(--primary);color:#fff;cursor:pointer
-    }
-    .btn.secondary{background:#e9f1f8;color:var(--primary)}
-    .hint{font-size:13px;color:var(--muted);line-height:1.55;margin-top:8px}
-    #reader{width:100%;overflow:hidden;border-radius:16px;margin-top:12px}
-    .status{padding:12px;border-radius:12px;margin-top:10px;font-size:14px;line-height:1.5}
-    .status.info{background:#eaf4ff;color:#174a74}
-    .status.error{background:#fff0ee;color:var(--danger)}
-    .status.ok{background:#ecfdf5;color:var(--ok)}
-    .hidden{display:none!important}
-    .footer{font-size:12px;color:var(--muted);text-align:center;line-height:1.55;padding:16px 8px}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b3f6f">
+<title>臺北市立聯合醫院仁愛院區｜多語用藥資訊工具</title>
+<style>
+:root{--bg:#f4f7fa;--card:#fff;--ink:#172033;--muted:#64748b;--primary:#0b3f6f;--primary2:#155c93;--line:#dbe3ec;--soft:#edf4fa;--danger:#b42318;--ok:#0f766e}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI","Noto Sans TC","PingFang TC",sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px 40px}
+.brand{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-radius:20px;padding:20px;box-shadow:0 10px 24px rgba(11,63,111,.16)}
+.hospital{font-size:13px;font-weight:700;opacity:.9}
+.brand h1{margin:6px 0 5px;font-size:24px}
+.brand p{margin:0;opacity:.93;line-height:1.55}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 4px 14px rgba(15,23,42,.05)}
+.title{font-size:19px;font-weight:850;margin-bottom:8px}
+select{width:100%;padding:14px;border:1px solid #b9c5d3;border-radius:12px;font-size:17px;background:#fff;color:var(--ink)}
+.btn{width:100%;border:0;border-radius:12px;padding:16px;margin-top:10px;font-size:18px;font-weight:850;background:var(--primary);color:#fff;cursor:pointer}
+.btn.secondary{background:var(--soft);color:var(--primary)}
+.hint{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px}
+#reader{width:100%;overflow:hidden;border-radius:16px;margin-top:12px}
+.status{padding:12px;border-radius:12px;margin-top:10px;font-size:14px;line-height:1.5}
+.status.info{background:#eaf4ff;color:#174a74}
+.status.error{background:#fff0ee;color:var(--danger)}
+.status.ok{background:#ecfdf5;color:var(--ok)}
+.notice{font-size:12px;color:var(--muted);line-height:1.6;text-align:center;padding:12px 8px}
+.hidden{display:none!important}
+</style>
 </head>
 <body>
 <div class="wrap">
   <section class="brand">
-    <h1 id="pageTitle">🌐 Multilingual Medication Information</h1>
-    <p id="pageSubtitle">Scan the QR code on your medication bag</p>
+    <div class="hospital">臺北市立聯合醫院 仁愛院區｜Renai Branch, Taipei City Hospital</div>
+    <h1 id="title">Multilingual Medication Information Tool</h1>
+    <p id="subtitle">Scan the QR code on your medication bag to view medication information in your language.</p>
   </section>
 
   <section class="card">
-    <div class="title" id="langTitle">Choose your language</div>
+    <div class="title" id="langTitle">Choose language</div>
     <select id="lang">
-      <option value="en">English</option>
-      <option value="vi">Tiếng Việt</option>
-      <option value="th">ไทย</option>
-      <option value="id">Bahasa Indonesia</option>
-      <option value="ja">日本語</option>
-      <option value="ko">한국어</option>
-      <option value="ms">Bahasa Melayu</option>
-      <option value="fil">Filipino</option>
-      <option value="my">မြန်မာ</option>
-      <option value="km">ភាសាខ្មែរ</option>
-      <option value="zh-TW">繁體中文</option>
+      <optgroup label="常用語言 / Common languages">
+        <option value="zh-TW">繁體中文</option>
+        <option value="en">English</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="vi">Tiếng Việt</option>
+        <option value="th">ไทย</option>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="tl">Filipino</option>
+      </optgroup>
+      <optgroup label="更多語言 / More languages">
+        <option value="zh-CN">简体中文</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="my">မြန်မာစာ</option>
+        <option value="km">ភាសាខ្មែរ</option>
+        <option value="hi">हिन्दी</option>
+        <option value="bn">বাংলা</option>
+        <option value="ar">العربية</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="pt">Português</option>
+        <option value="ru">Русский</option>
+      </optgroup>
     </select>
   </section>
 
   <section class="card">
     <div class="title" id="scanTitle">Scan medication bag QR code</div>
-    <div class="hint" id="scanHint">Point the rear camera at the QR code. It will open automatically after detection.</div>
-
-    <button class="btn" id="startBtn" onclick="startScanner()">📷 Start camera scan</button>
+    <div class="hint" id="scanHint">Point the rear camera at the QR code. Medication information will open automatically.</div>
+    <button class="btn" id="startBtn" onclick="startScanner()">📷 Start scanning</button>
     <button class="btn secondary hidden" id="stopBtn" onclick="stopScanner()">Stop camera</button>
-
     <div id="reader"></div>
     <div id="status" class="status info hidden"></div>
   </section>
 
-  <div class="footer" id="footer">
-    No photo is stored. The QR code is read only in your browser.
-  </div>
+  <div class="notice" id="notice">No photo is stored. The QR code is read only in your browser.</div>
 </div>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-  // 只要把下面這一行換成你部署後的 Apps Script /exec 網址即可。
-  const APP_URL = 'https://script.google.com/macros/s/AKfycbymMbpBNtmxqVe1UhLms05--O542atOYW3eJx3nFZElI8ic6SP5oCCEBxrAGb_oKJvTEw/exec';
+const APP_URL='https://script.google.com/macros/s/AKfycbymMbpBNtmxqVe1UhLms05--O542atOYW3eJx3nFZElI8ic6SP5oCCEBxrAGb_oKJvTEw/exec';
 
-  let scanner = null;
-  let starting = false;
-  let detected = false;
+let scanner=null,starting=false,detected=false;
+const langEl=document.getElementById('lang');
 
-  const UI = {
-    en: {
-      title:'🌐 Multilingual Medication Information',
-      subtitle:'Scan the QR code on your medication bag',
-      lang:'Choose your language',
-      scan:'Scan medication bag QR code',
-      hint:'Point the rear camera at the QR code. It will open automatically after detection.',
-      start:'📷 Start camera scan',
-      stop:'Stop camera',
-      opening:'Opening camera…',
-      ready:'Camera ready. Point it at the QR code.',
-      found:'QR code detected. Opening medication information…',
-      invalid:'This QR code is not a supported medication information QR code.',
-      cameraError:'Camera could not be opened. Please allow camera access in your browser and try again.',
-      config:'Please set APP_URL in index.html before publishing.',
-      footer:'No photo is stored. The QR code is read only in your browser.'
+const UI={
+'en':{title:'Multilingual Medication Information Tool',subtitle:'Scan the QR code on your medication bag to view medication information in your language.',lang:'Choose language',scan:'Scan medication bag QR code',hint:'Point the rear camera at the QR code. Medication information will open automatically.',start:'📷 Start scanning',stop:'Stop camera',opening:'Opening camera…',ready:'Camera ready. Point it at the QR code.',found:'QR code detected. Opening medication information…',invalid:'This is not a supported medication information QR code.',camera:'Camera could not be opened. Please allow camera access and try again.',notice:'No photo is stored. The QR code is read only in your browser.'},
+'zh-TW':{title:'多語用藥資訊工具',subtitle:'掃描藥袋 QR Code，即可查看多語藥品資訊。',lang:'選擇語言',scan:'掃描藥袋 QR Code',hint:'將後鏡頭對準藥袋 QR Code，辨識成功後會自動開啟藥品資訊。',start:'📷 開始掃描',stop:'停止相機',opening:'正在開啟相機…',ready:'相機已開啟，請對準藥袋 QR Code。',found:'已辨識 QR Code，正在開啟藥品資訊…',invalid:'這不是支援的藥品資訊 QR Code。',camera:'無法開啟相機，請允許瀏覽器使用相機後再試一次。',notice:'不會儲存照片；QR Code 僅在您的瀏覽器中辨識。'},
+'zh-CN':{title:'多语用药信息工具',subtitle:'扫描药袋二维码，即可查看多语言药品信息。',lang:'选择语言',scan:'扫描药袋二维码',hint:'将后置摄像头对准药袋二维码，识别成功后会自动打开药品信息。',start:'📷 开始扫描',stop:'停止摄像头',opening:'正在打开摄像头…',ready:'摄像头已打开，请对准药袋二维码。',found:'已识别二维码，正在打开药品信息…',invalid:'这不是支持的药品信息二维码。',camera:'无法打开摄像头，请允许浏览器使用摄像头后重试。',notice:'不会保存照片；二维码仅在您的浏览器中识别。'},
+'ja':{title:'多言語お薬情報ツール',subtitle:'薬袋のQRコードをスキャンして、選択した言語で薬品情報を確認できます。',lang:'言語を選択',scan:'薬袋のQRコードをスキャン',hint:'背面カメラをQRコードに向けてください。認識後、自動的に薬品情報を開きます。',start:'📷 スキャン開始',stop:'カメラを停止',opening:'カメラを起動しています…',ready:'カメラが起動しました。QRコードに向けてください。',found:'QRコードを認識しました。薬品情報を開いています…',invalid:'対応する薬品情報QRコードではありません。',camera:'カメラを開けません。ブラウザのカメラ許可を確認してください。',notice:'写真は保存されません。QRコードはブラウザ内でのみ読み取られます。'},
+'ko':{title:'다국어 복약 정보 도구',subtitle:'약봉투의 QR 코드를 스캔하여 선택한 언어로 약품 정보를 확인하세요.',lang:'언어 선택',scan:'약봉투 QR 코드 스캔',hint:'후면 카메라를 QR 코드에 맞추면 인식 후 자동으로 약품 정보가 열립니다.',start:'📷 스캔 시작',stop:'카메라 중지',opening:'카메라를 여는 중…',ready:'카메라가 준비되었습니다. QR 코드를 비춰 주세요.',found:'QR 코드를 인식했습니다. 약품 정보를 여는 중…',invalid:'지원되는 약품 정보 QR 코드가 아닙니다.',camera:'카메라를 열 수 없습니다. 브라우저의 카메라 권한을 허용해 주세요.',notice:'사진은 저장되지 않으며 QR 코드는 브라우저에서만 인식됩니다.'},
+'vi':{title:'Công cụ thông tin thuốc đa ngôn ngữ',subtitle:'Quét mã QR trên túi thuốc để xem thông tin bằng ngôn ngữ của bạn.',lang:'Chọn ngôn ngữ',scan:'Quét mã QR trên túi thuốc',hint:'Hướng camera sau vào mã QR. Thông tin thuốc sẽ tự động mở sau khi nhận diện.',start:'📷 Bắt đầu quét',stop:'Dừng camera',opening:'Đang mở camera…',ready:'Camera đã sẵn sàng. Hướng vào mã QR.',found:'Đã nhận diện mã QR. Đang mở thông tin thuốc…',invalid:'Đây không phải mã QR thông tin thuốc được hỗ trợ.',camera:'Không thể mở camera. Vui lòng cho phép quyền camera và thử lại.',notice:'Không lưu ảnh; mã QR chỉ được đọc trong trình duyệt.'},
+'th':{title:'เครื่องมือข้อมูลยาหลายภาษา',subtitle:'สแกน QR Code บนถุงยาเพื่อดูข้อมูลยาในภาษาของคุณ',lang:'เลือกภาษา',scan:'สแกน QR Code บนถุงยา',hint:'หันกล้องหลังไปที่ QR Code เมื่ออ่านได้ ระบบจะเปิดข้อมูลยาโดยอัตโนมัติ',start:'📷 เริ่มสแกน',stop:'หยุดกล้อง',opening:'กำลังเปิดกล้อง…',ready:'กล้องพร้อมแล้ว กรุณาหันไปที่ QR Code',found:'ตรวจพบ QR Code กำลังเปิดข้อมูลยา…',invalid:'นี่ไม่ใช่ QR Code ข้อมูลยาที่รองรับ',camera:'ไม่สามารถเปิดกล้องได้ โปรดอนุญาตการใช้กล้องแล้วลองอีกครั้ง',notice:'ไม่มีการบันทึกรูปภาพ QR Code จะถูกอ่านเฉพาะในเบราว์เซอร์ของคุณ'},
+'id':{title:'Alat Informasi Obat Multibahasa',subtitle:'Pindai kode QR pada kantong obat untuk melihat informasi dalam bahasa Anda.',lang:'Pilih bahasa',scan:'Pindai kode QR pada kantong obat',hint:'Arahkan kamera belakang ke kode QR. Informasi obat akan terbuka otomatis.',start:'📷 Mulai memindai',stop:'Hentikan kamera',opening:'Membuka kamera…',ready:'Kamera siap. Arahkan ke kode QR.',found:'Kode QR terdeteksi. Membuka informasi obat…',invalid:'Ini bukan kode QR informasi obat yang didukung.',camera:'Kamera tidak dapat dibuka. Izinkan akses kamera lalu coba lagi.',notice:'Foto tidak disimpan. Kode QR hanya dibaca di browser Anda.'}
+};
+
+function ui(){return UI[langEl.value]||UI.en}
+
+function detectLanguage(){
+ const raw=(navigator.language||'en').toLowerCase();
+ if(raw.startsWith('zh-cn')||raw.startsWith('zh-sg'))return'zh-CN';
+ if(raw.startsWith('zh'))return'zh-TW';
+ for(const c of ['ja','ko','vi','th','id','ms','my','km','hi','bn','ar','es','fr','de','pt','ru'])if(raw.startsWith(c))return c;
+ if(raw.startsWith('fil')||raw.startsWith('tl'))return'tl';
+ return'en';
+}
+
+function applyUi(){
+ const x=ui();
+ title.textContent=x.title;subtitle.textContent=x.subtitle;langTitle.textContent=x.lang;
+ scanTitle.textContent=x.scan;scanHint.textContent=x.hint;startBtn.textContent=x.start;stopBtn.textContent=x.stop;
+ notice.textContent=x.notice;
+ document.documentElement.dir=langEl.value==='ar'?'rtl':'ltr';
+}
+
+function setStatus(msg,type='info'){status.textContent=msg;status.className='status '+type;status.classList.remove('hidden')}
+
+function extractCode(text){
+ const s=String(text||'').trim();
+ if(/^[A-Za-z0-9_.-]{1,40}$/.test(s))return s;
+ if(!/^https:\/\/websrv01\.tpech\.gov\.tw\/ESMC\/Home\/Detail\?/i.test(s))return'';
+ const m=s.match(/[?&]odr_code=([^&#]+)/i);
+ if(!m||!m[1])return'';
+ try{return decodeURIComponent(m[1]).trim()}catch(e){return m[1].trim()}
+}
+
+async function startScanner(){
+ if(starting||detected)return;
+ starting=true;setStatus(ui().opening,'info');
+ try{
+   scanner=new Html5Qrcode('reader');
+   await scanner.start(
+    {facingMode:'environment'},
+    {fps:10,qrbox:(w,h)=>{const s=Math.floor(Math.min(w,h)*.72);return{width:s,height:s}},aspectRatio:1},
+    async decodedText=>{
+      if(detected)return;
+      const code=extractCode(decodedText);
+      if(!code){setStatus(ui().invalid,'error');return}
+      detected=true;setStatus(ui().found,'ok');
+      try{await stopScanner(false)}catch(e){}
+      location.href=APP_URL+'?odr_code='+encodeURIComponent(code)+'&lang='+encodeURIComponent(langEl.value);
     },
-    'zh-TW': {
-      title:'🌐 多語用藥資訊',
-      subtitle:'直接掃描藥袋上的 QR Code',
-      lang:'選擇語言',
-      scan:'掃描藥袋 QR Code',
-      hint:'將後鏡頭對準藥袋 QR Code，辨識成功後會自動開啟藥品資訊。',
-      start:'📷 開始掃描',
-      stop:'停止相機',
-      opening:'正在開啟相機…',
-      ready:'相機已開啟，請對準藥袋 QR Code。',
-      found:'已辨識 QR Code，正在開啟藥品資訊…',
-      invalid:'這不是支援的藥品資訊 QR Code。',
-      cameraError:'無法開啟相機，請允許瀏覽器使用相機後再試一次。',
-      config:'請先在 index.html 設定 APP_URL 再發布。',
-      footer:'不會儲存照片；QR Code 僅在您的瀏覽器中辨識。'
-    }
-  };
+    ()=>{}
+   );
+   startBtn.classList.add('hidden');stopBtn.classList.remove('hidden');setStatus(ui().ready,'info');
+ }catch(err){
+   setStatus(ui().camera,'error');scanner=null;startBtn.classList.remove('hidden');stopBtn.classList.add('hidden');
+ }finally{starting=false}
+}
 
-  const langEl = document.getElementById('lang');
+async function stopScanner(showStart=true){
+ try{if(scanner&&scanner.isScanning)await scanner.stop();if(scanner)await scanner.clear()}catch(e){}
+ scanner=null;
+ if(showStart){startBtn.classList.remove('hidden');stopBtn.classList.add('hidden')}
+}
 
-  function detectLanguage(){
-    const raw = (navigator.language || 'en').toLowerCase();
-    if (raw.startsWith('zh')) return 'zh-TW';
-    if (raw.startsWith('vi')) return 'vi';
-    if (raw.startsWith('th')) return 'th';
-    if (raw.startsWith('id')) return 'id';
-    if (raw.startsWith('ja')) return 'ja';
-    if (raw.startsWith('ko')) return 'ko';
-    if (raw.startsWith('ms')) return 'ms';
-    if (raw.startsWith('fil') || raw.startsWith('tl')) return 'fil';
-    if (raw.startsWith('my')) return 'my';
-    if (raw.startsWith('km')) return 'km';
-    return 'en';
-  }
-
-  function t(){ return UI[langEl.value] || UI.en; }
-
-  function applyUi(){
-    const x = t();
-    document.getElementById('pageTitle').textContent = x.title;
-    document.getElementById('pageSubtitle').textContent = x.subtitle;
-    document.getElementById('langTitle').textContent = x.lang;
-    document.getElementById('scanTitle').textContent = x.scan;
-    document.getElementById('scanHint').textContent = x.hint;
-    document.getElementById('startBtn').textContent = x.start;
-    document.getElementById('stopBtn').textContent = x.stop;
-    document.getElementById('footer').textContent = x.footer;
-  }
-
-  function setStatus(msg, type='info'){
-    const el = document.getElementById('status');
-    el.textContent = msg;
-    el.className = 'status ' + type;
-    el.classList.remove('hidden');
-  }
-
-  function extractCode(text){
-    const s = String(text || '').trim();
-
-    if (/^[A-Za-z0-9_.-]{1,40}$/.test(s)) return s;
-
-    const allowed = /^https:\/\/websrv01\.tpech\.gov\.tw\/ESMC\/Home\/Detail\?/i;
-    if (!allowed.test(s)) return '';
-
-    const m = s.match(/[?&]odr_code=([^&#]+)/i);
-    if (!m || !m[1]) return '';
-
-    try { return decodeURIComponent(m[1]).trim(); }
-    catch(e){ return m[1].trim(); }
-  }
-
-  async function startScanner(){
-    if (starting || detected) return;
-
-    if (!APP_URL || APP_URL.includes('PASTE_YOUR_')) {
-      setStatus(t().config, 'error');
-      return;
-    }
-
-    starting = true;
-    setStatus(t().opening, 'info');
-
-    try{
-      scanner = new Html5Qrcode('reader');
-
-      await scanner.start(
-        { facingMode:'environment' },
-        {
-          fps: 10,
-          qrbox: function(viewfinderWidth, viewfinderHeight){
-            const min = Math.min(viewfinderWidth, viewfinderHeight);
-            const size = Math.floor(min * 0.72);
-            return { width:size, height:size };
-          },
-          aspectRatio: 1.0
-        },
-        async decodedText => {
-          if (detected) return;
-
-          const code = extractCode(decodedText);
-          if (!code) {
-            setStatus(t().invalid, 'error');
-            return;
-          }
-
-          detected = true;
-          setStatus(t().found, 'ok');
-
-          try { await stopScanner(false); } catch(e){}
-
-          const lang = encodeURIComponent(langEl.value);
-          const url = APP_URL +
-            (APP_URL.includes('?') ? '&' : '?') +
-            'odr_code=' + encodeURIComponent(code) +
-            '&lang=' + lang;
-
-          window.location.href = url;
-        },
-        () => {}
-      );
-
-      document.getElementById('startBtn').classList.add('hidden');
-      document.getElementById('stopBtn').classList.remove('hidden');
-      setStatus(t().ready, 'info');
-    }catch(err){
-      setStatus(t().cameraError, 'error');
-      scanner = null;
-      document.getElementById('startBtn').classList.remove('hidden');
-      document.getElementById('stopBtn').classList.add('hidden');
-    }finally{
-      starting = false;
-    }
-  }
-
-  async function stopScanner(showStart=true){
-    try{
-      if (scanner && scanner.isScanning) await scanner.stop();
-      if (scanner) await scanner.clear();
-    }catch(e){}
-    scanner = null;
-
-    if (showStart){
-      document.getElementById('startBtn').classList.remove('hidden');
-      document.getElementById('stopBtn').classList.add('hidden');
-    }
-  }
-
-  langEl.value = detectLanguage();
-  applyUi();
-  langEl.addEventListener('change', applyUi);
-
-  // 先嘗試自動開鏡頭；若瀏覽器要求使用者手勢，仍保留開始掃描按鈕。
-  window.addEventListener('load', () => {
-    setTimeout(() => startScanner(), 350);
-  });
+langEl.value=localStorage.getItem('drugToolLang')||detectLanguage();
+if(![...langEl.options].some(o=>o.value===langEl.value))langEl.value='en';
+applyUi();
+langEl.addEventListener('change',()=>{localStorage.setItem('drugToolLang',langEl.value);applyUi()});
+window.addEventListener('load',()=>setTimeout(()=>startScanner(),350));
 </script>
 </body>
 </html>
