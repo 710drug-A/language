@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f4c81">
+  <title>Multilingual Medication Scanner</title>
+  <style>
+    :root{
+      --bg:#f5f7fa;--card:#fff;--ink:#1e293b;--muted:#64748b;
+      --primary:#0f4c81;--primary2:#1667a8;--line:#dbe3ec;
+      --danger:#b42318;--ok:#0f766e
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:system-ui,-apple-system,"Segoe UI","Noto Sans TC","PingFang TC",sans-serif;
+      background:var(--bg);color:var(--ink)
+    }
+    .wrap{max-width:760px;margin:0 auto;padding:18px 14px 36px}
+    .brand{
+      background:linear-gradient(135deg,var(--primary),var(--primary2));
+      color:#fff;border-radius:20px;padding:22px 20px;margin-bottom:14px;
+      box-shadow:0 10px 24px rgba(15,76,129,.16)
+    }
+    .brand h1{margin:0 0 6px;font-size:26px}
+    .brand p{margin:0;opacity:.94;line-height:1.5}
+    .card{
+      background:#fff;border:1px solid var(--line);border-radius:18px;
+      padding:18px;margin:12px 0;box-shadow:0 4px 14px rgba(15,23,42,.05)
+    }
+    .title{font-size:20px;font-weight:850;margin-bottom:8px}
+    select{
+      width:100%;padding:14px;border:1px solid #b9c5d3;border-radius:12px;
+      font-size:17px;background:#fff;color:var(--ink)
+    }
+    .btn{
+      width:100%;border:0;border-radius:12px;padding:15px 16px;margin-top:10px;
+      font-size:18px;font-weight:800;background:var(--primary);color:#fff;cursor:pointer
+    }
+    .btn.secondary{background:#e9f1f8;color:var(--primary)}
+    .hint{font-size:13px;color:var(--muted);line-height:1.55;margin-top:8px}
+    #reader{width:100%;overflow:hidden;border-radius:16px;margin-top:12px}
+    .status{padding:12px;border-radius:12px;margin-top:10px;font-size:14px;line-height:1.5}
+    .status.info{background:#eaf4ff;color:#174a74}
+    .status.error{background:#fff0ee;color:var(--danger)}
+    .status.ok{background:#ecfdf5;color:var(--ok)}
+    .hidden{display:none!important}
+    .footer{font-size:12px;color:var(--muted);text-align:center;line-height:1.55;padding:16px 8px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <section class="brand">
+    <h1 id="pageTitle">🌐 Multilingual Medication Information</h1>
+    <p id="pageSubtitle">Scan the QR code on your medication bag</p>
+  </section>
+
+  <section class="card">
+    <div class="title" id="langTitle">Choose your language</div>
+    <select id="lang">
+      <option value="en">English</option>
+      <option value="vi">Tiếng Việt</option>
+      <option value="th">ไทย</option>
+      <option value="id">Bahasa Indonesia</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+      <option value="ms">Bahasa Melayu</option>
+      <option value="fil">Filipino</option>
+      <option value="my">မြန်မာ</option>
+      <option value="km">ភាសាខ្មែរ</option>
+      <option value="zh-TW">繁體中文</option>
+    </select>
+  </section>
+
+  <section class="card">
+    <div class="title" id="scanTitle">Scan medication bag QR code</div>
+    <div class="hint" id="scanHint">Point the rear camera at the QR code. It will open automatically after detection.</div>
+
+    <button class="btn" id="startBtn" onclick="startScanner()">📷 Start camera scan</button>
+    <button class="btn secondary hidden" id="stopBtn" onclick="stopScanner()">Stop camera</button>
+
+    <div id="reader"></div>
+    <div id="status" class="status info hidden"></div>
+  </section>
+
+  <div class="footer" id="footer">
+    No photo is stored. The QR code is read only in your browser.
+  </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  // 只要把下面這一行換成你部署後的 Apps Script /exec 網址即可。
+  const APP_URL = 'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+
+  let scanner = null;
+  let starting = false;
+  let detected = false;
+
+  const UI = {
+    en: {
+      title:'🌐 Multilingual Medication Information',
+      subtitle:'Scan the QR code on your medication bag',
+      lang:'Choose your language',
+      scan:'Scan medication bag QR code',
+      hint:'Point the rear camera at the QR code. It will open automatically after detection.',
+      start:'📷 Start camera scan',
+      stop:'Stop camera',
+      opening:'Opening camera…',
+      ready:'Camera ready. Point it at the QR code.',
+      found:'QR code detected. Opening medication information…',
+      invalid:'This QR code is not a supported medication information QR code.',
+      cameraError:'Camera could not be opened. Please allow camera access in your browser and try again.',
+      config:'Please set APP_URL in index.html before publishing.',
+      footer:'No photo is stored. The QR code is read only in your browser.'
+    },
+    'zh-TW': {
+      title:'🌐 多語用藥資訊',
+      subtitle:'直接掃描藥袋上的 QR Code',
+      lang:'選擇語言',
+      scan:'掃描藥袋 QR Code',
+      hint:'將後鏡頭對準藥袋 QR Code，辨識成功後會自動開啟藥品資訊。',
+      start:'📷 開始掃描',
+      stop:'停止相機',
+      opening:'正在開啟相機…',
+      ready:'相機已開啟，請對準藥袋 QR Code。',
+      found:'已辨識 QR Code，正在開啟藥品資訊…',
+      invalid:'這不是支援的藥品資訊 QR Code。',
+      cameraError:'無法開啟相機，請允許瀏覽器使用相機後再試一次。',
+      config:'請先在 index.html 設定 APP_URL 再發布。',
+      footer:'不會儲存照片；QR Code 僅在您的瀏覽器中辨識。'
+    }
+  };
+
+  const langEl = document.getElementById('lang');
+
+  function detectLanguage(){
+    const raw = (navigator.language || 'en').toLowerCase();
+    if (raw.startsWith('zh')) return 'zh-TW';
+    if (raw.startsWith('vi')) return 'vi';
+    if (raw.startsWith('th')) return 'th';
+    if (raw.startsWith('id')) return 'id';
+    if (raw.startsWith('ja')) return 'ja';
+    if (raw.startsWith('ko')) return 'ko';
+    if (raw.startsWith('ms')) return 'ms';
+    if (raw.startsWith('fil') || raw.startsWith('tl')) return 'fil';
+    if (raw.startsWith('my')) return 'my';
+    if (raw.startsWith('km')) return 'km';
+    return 'en';
+  }
+
+  function t(){ return UI[langEl.value] || UI.en; }
+
+  function applyUi(){
+    const x = t();
+    document.getElementById('pageTitle').textContent = x.title;
+    document.getElementById('pageSubtitle').textContent = x.subtitle;
+    document.getElementById('langTitle').textContent = x.lang;
+    document.getElementById('scanTitle').textContent = x.scan;
+    document.getElementById('scanHint').textContent = x.hint;
+    document.getElementById('startBtn').textContent = x.start;
+    document.getElementById('stopBtn').textContent = x.stop;
+    document.getElementById('footer').textContent = x.footer;
+  }
+
+  function setStatus(msg, type='info'){
+    const el = document.getElementById('status');
+    el.textContent = msg;
+    el.className = 'status ' + type;
+    el.classList.remove('hidden');
+  }
+
+  function extractCode(text){
+    const s = String(text || '').trim();
+
+    if (/^[A-Za-z0-9_.-]{1,40}$/.test(s)) return s;
+
+    const allowed = /^https:\/\/websrv01\.tpech\.gov\.tw\/ESMC\/Home\/Detail\?/i;
+    if (!allowed.test(s)) return '';
+
+    const m = s.match(/[?&]odr_code=([^&#]+)/i);
+    if (!m || !m[1]) return '';
+
+    try { return decodeURIComponent(m[1]).trim(); }
+    catch(e){ return m[1].trim(); }
+  }
+
+  async function startScanner(){
+    if (starting || detected) return;
+
+    if (!APP_URL || APP_URL.includes('PASTE_YOUR_')) {
+      setStatus(t().config, 'error');
+      return;
+    }
+
+    starting = true;
+    setStatus(t().opening, 'info');
+
+    try{
+      scanner = new Html5Qrcode('reader');
+
+      await scanner.start(
+        { facingMode:'environment' },
+        {
+          fps: 10,
+          qrbox: function(viewfinderWidth, viewfinderHeight){
+            const min = Math.min(viewfinderWidth, viewfinderHeight);
+            const size = Math.floor(min * 0.72);
+            return { width:size, height:size };
+          },
+          aspectRatio: 1.0
+        },
+        async decodedText => {
+          if (detected) return;
+
+          const code = extractCode(decodedText);
+          if (!code) {
+            setStatus(t().invalid, 'error');
+            return;
+          }
+
+          detected = true;
+          setStatus(t().found, 'ok');
+
+          try { await stopScanner(false); } catch(e){}
+
+          const lang = encodeURIComponent(langEl.value);
+          const url = APP_URL +
+            (APP_URL.includes('?') ? '&' : '?') +
+            'odr_code=' + encodeURIComponent(code) +
+            '&lang=' + lang;
+
+          window.location.href = url;
+        },
+        () => {}
+      );
+
+      document.getElementById('startBtn').classList.add('hidden');
+      document.getElementById('stopBtn').classList.remove('hidden');
+      setStatus(t().ready, 'info');
+    }catch(err){
+      setStatus(t().cameraError, 'error');
+      scanner = null;
+      document.getElementById('startBtn').classList.remove('hidden');
+      document.getElementById('stopBtn').classList.add('hidden');
+    }finally{
+      starting = false;
+    }
+  }
+
+  async function stopScanner(showStart=true){
+    try{
+      if (scanner && scanner.isScanning) await scanner.stop();
+      if (scanner) await scanner.clear();
+    }catch(e){}
+    scanner = null;
+
+    if (showStart){
+      document.getElementById('startBtn').classList.remove('hidden');
+      document.getElementById('stopBtn').classList.add('hidden');
+    }
+  }
+
+  langEl.value = detectLanguage();
+  applyUi();
+  langEl.addEventListener('change', applyUi);
+
+  // 先嘗試自動開鏡頭；若瀏覽器要求使用者手勢，仍保留開始掃描按鈕。
+  window.addEventListener('load', () => {
+    setTimeout(() => startScanner(), 350);
+  });
+</script>
+</body>
+</html>
