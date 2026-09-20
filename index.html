@@ -35,6 +35,15 @@ select{width:100%;padding:14px;border:1px solid #b9c5d3;border-radius:12px;font-
 .status{padding:12px;border-radius:12px;margin-top:10px;font-size:14px;line-height:1.5}
 .status.info{background:#eaf4ff;color:#174a74} .status.error{background:#fff0ee;color:var(--danger)} .status.ok{background:#ecfdf5;color:var(--ok)}
 .notice{font-size:12px;color:var(--muted);line-height:1.6;text-align:center;padding:12px 8px}
+.desktopBox{margin-top:14px}
+.desktopBox details{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+.desktopBox summary{cursor:pointer;padding:14px 16px;font-weight:850;color:var(--primary);background:#f8fbfe}
+.desktopInner{padding:15px}
+.codeRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.codeInput{width:100%;min-width:0;padding:13px 14px;border:1px solid #b9c5d3;border-radius:11px;font-size:16px;color:var(--ink)}
+.codeBtn{border:0;border-radius:11px;padding:12px 16px;background:var(--primary);color:#fff;font-weight:850;cursor:pointer}
+.desktopHint{font-size:12px;color:var(--muted);line-height:1.55;margin-top:8px}
+@media(max-width:520px){.codeRow{grid-template-columns:1fr}.codeBtn{width:100%}}
 .hidden{display:none!important}
 @media(max-width:520px){.wrap{padding-left:16px;padding-right:16px}.card{padding:18px}.brand h1{font-size:25px}.scanFrame{width:72%;max-width:320px}}
 </style>
@@ -76,6 +85,23 @@ select{width:100%;padding:14px;border:1px solid #b9c5d3;border-radius:12px;font-
   </select>
 </section>
 
+<section class="desktopBox">
+  <details>
+    <summary>⌨️ 藥師／電腦使用｜Pharmacist / Desktop</summary>
+    <div class="desktopInner">
+      <div class="codeRow">
+        <input id="manualCode" class="codeInput" type="text" inputmode="text"
+               autocomplete="off" placeholder="輸入藥品代碼，例如 TFOST2">
+        <button class="codeBtn" type="button" onclick="openByCode()">查詢 / Open</button>
+      </div>
+      <div class="desktopHint">
+        供藥師於桌機直接輸入藥品代碼，選好病人語言後開啟多語資訊並列印紙本。
+        For pharmacist/desktop use: enter a medication code, choose the patient's language, then open and print.
+      </div>
+    </div>
+  </details>
+</section>
+
 <section class="card" id="scanCard">
   <div class="title" id="scanTitle"></div>
   <div class="guide" id="guideBlock">
@@ -91,7 +117,7 @@ select{width:100%;padding:14px;border:1px solid #b9c5d3;border-radius:12px;font-
   </div>
   <div id="status" class="status info hidden"></div>
 </section>
-<div class="notice" id="notice"></div><div class="notice" style="font-size:10px;opacity:.55">Scanner v1.14.1</div>
+<div class="notice" id="notice"></div><div class="notice" style="font-size:10px;opacity:.55">Scanner v1.17</div>
 </div>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -143,6 +169,30 @@ function extractCode(text){
   if(!m||!m[1])return'';
   try{return decodeURIComponent(m[1]).trim()}catch(e){return m[1].trim()}
 }
+
+function openByCode(){
+  const input=document.getElementById('manualCode');
+  const raw=(input&&input.value||'').trim();
+  const code=extractCode(raw);
+  if(!code){
+    setStatus('請輸入有效藥品代碼。Please enter a valid medication code.','error');
+    if(input) input.focus();
+    return;
+  }
+  const url = APP_URL +
+    (APP_URL.includes('?') ? '&' : '?') +
+    'odr_code=' + encodeURIComponent(code) +
+    '&lang=' + encodeURIComponent(langEl.value) +
+    '&return_url=' + encodeURIComponent(window.location.href.split('#')[0]);
+  window.location.href=url;
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter' && document.activeElement && document.activeElement.id==='manualCode'){
+    e.preventDefault();
+    openByCode();
+  }
+});
+
 async function startScanner(){
   if (starting) return;
 
